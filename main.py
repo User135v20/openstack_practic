@@ -1,3 +1,6 @@
+import time
+import sys
+
 from glanceclient.client import Client as _glance
 from keystoneauth1 import identity, session
 from neutronclient.v2_0 import client
@@ -41,18 +44,24 @@ def create_session():
 
 
 def create_server(sess):
+    server_name = str(input("Please enter server name: "))
     nova = _nova("2", session=sess)
     flavor_id = "c1"
     flavor = nova.flavors.get(flavor_id)
     image_id = "e207ec98-21d4-47d7-b491-384ca824631f"
-
     glance = _glance("2", session=sess)
     image = glance.images.get(image_id)
-    server = nova.servers.create("TestServer2", image, flavor, nics=[{"net-id": network_id}])
-    print(server.id)
+    server = nova.servers.create(server_name, image, flavor, nics=[{"net-id": network_id}])
+    #print(server.id)
     return server
 
+def print_status(server):
+    print(server.status)
 
+print("application for creating a server\n")
 sess = create_session()
 network_id, subnet_id = create_network(sess)
 server = create_server(sess)
+for i in range(5):
+    print_status(server)
+    time.sleep(5)
