@@ -2,7 +2,7 @@ import time
 import sys
 
 from glanceclient.client import Client as _glance
-from keystoneauth1 import identity, session
+import create_session
 from neutronclient.v2_0 import client
 from novaclient.client import Client as _nova
 
@@ -24,25 +24,6 @@ def create_network(sess):
     return network_id, subnet_id
 
 
-def create_session():
-    username = "demo"
-    password = "secret"
-    project_name = "demo"
-    project_domain_id = "default"
-    user_domain_id = "default"
-    auth_url = "http://10.0.2.15/identity"
-    auth = identity.Password(
-        auth_url=auth_url,
-        username=username,
-        password=password,
-        project_name=project_name,
-        project_domain_id=project_domain_id,
-        user_domain_id=user_domain_id,
-    )
-    sess = session.Session(auth=auth)
-    return sess
-
-
 def create_server(sess):
     server_name = str(input("Please enter server name: "))
     nova = _nova("2", session=sess)
@@ -52,16 +33,14 @@ def create_server(sess):
     glance = _glance("2", session=sess)
     image = glance.images.get(image_id)
     server = nova.servers.create(server_name, image, flavor, nics=[{"net-id": network_id}])
-    #print(server.id)
     return server
 
-def print_status(server):
-    print(server.status)
 
 print("application for creating a server\n")
-sess = create_session()
+sess = create_session.create()
 network_id, subnet_id = create_network(sess)
 server = create_server(sess)
+print("server's status")
 for i in range(5):
-    print_status(server)
+    print(server.status)
     time.sleep(5)
