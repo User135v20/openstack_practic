@@ -1,15 +1,13 @@
 import time
-import sys
-
-from glanceclient.client import Client as _glance
-import create_session
 from neutronclient.v2_0 import client
 from novaclient.client import Client as _nova
+
+import create_session
 
 
 def create_network(sess):
     neutron = client.Client(session=sess)
-    #print(neutron.list_networks())
+    # print(neutron.list_networks())
 
     body_sample = {"network": {"name": "test"}}
     netw = neutron.create_network(body=body_sample)
@@ -28,11 +26,8 @@ def create_server(sess, network_id):
     server_name = str(input("Please enter server name: "))
     nova = _nova("2", session=sess)
     flavor_id = "c1"
-    flavor = nova.flavors.get(flavor_id)
     image_id = "e207ec98-21d4-47d7-b491-384ca824631f"
-    glance = _glance("2", session=sess)
-    image = glance.images.get(image_id)
-    server = nova.servers.create(server_name, image, flavor, nics=[{"net-id": network_id}])
+    server = nova.servers.create(server_name, image_id, flavor_id, nics=[{"net-id": network_id}])
     return server
 
 

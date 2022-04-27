@@ -7,7 +7,7 @@ def delete_networks(sess):
     neutron = client.Client(session=sess)
     networks = neutron.list_networks()["networks"]
     for network in networks:
-        if network["name"].startswith("Test"):
+        if network["name"].startswith("test"):
             neutron.delete_network(network["id"])
 
 
