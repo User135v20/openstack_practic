@@ -9,7 +9,7 @@ from novaclient.client import Client as _nova
 
 def create_network(sess):
     neutron = client.Client(session=sess)
-    print(neutron.list_networks())
+    #print(neutron.list_networks())
 
     body_sample = {"network": {"name": "test"}}
     netw = neutron.create_network(body=body_sample)
@@ -24,7 +24,7 @@ def create_network(sess):
     return network_id, subnet_id
 
 
-def create_server(sess):
+def create_server(sess, network_id):
     server_name = str(input("Please enter server name: "))
     nova = _nova("2", session=sess)
     flavor_id = "c1"
@@ -39,7 +39,7 @@ def create_server(sess):
 print("application for creating a server\n")
 sess = create_session.create()
 network_id, subnet_id = create_network(sess)
-server = create_server(sess)
+server = create_server(sess, network_id)
 print("server's status")
 for i in range(5):
     print(server.status)
